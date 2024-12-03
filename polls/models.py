@@ -1,5 +1,4 @@
 import datetime
-
 from django.db import models
 from django.utils import timezone
 
@@ -18,7 +17,6 @@ class Question(models.Model):
     was_published_recently.boolean = True
     was_published_recently.short_description = 'Published recently?'
 
-
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
@@ -26,3 +24,11 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
+
+
+class Categoria(models.Model):
+    Abr = models.CharField(max_length=4)
+    Nombre = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.Abr + " - " + self.Nombre
