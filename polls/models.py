@@ -29,6 +29,6 @@ class Choice(models.Model):
 class Categoria(models.Model):
     Abr = models.CharField(max_length=4)
     Nombre = models.CharField(max_length=50)
-
+    Cantidad = models.IntegerField(default=0)
     def __str__(self):
         return self.Abr + " - " + self.Nombre
