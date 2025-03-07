@@ -1,13 +1,13 @@
 pipeline {
     agent {
-        docker { image 'python:3.10'
+        docker { image 'python:3'
         args '-u root:root'
         }
     }
     stages {
         stage('Clone') {
             steps {
-                git branch:'master',url:'https://github.com/alealbaladejo/django_tutorial.git'
+                git branch:'master',url:'https://github.com/raulhr16/django_tutorial'
             }
         }
         stage('Install') {
