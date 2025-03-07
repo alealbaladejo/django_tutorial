@@ -8,7 +8,7 @@ pipeline {
         stage("Bajar_imagen") {
             agent {
                 docker {
-                    image "python:3"
+                    image "python:latest"
                     args '-u root:root'
                 }
             }
