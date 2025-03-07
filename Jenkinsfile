@@ -1,55 +1,69 @@
 pipeline {
-    agent none  // No se ejecuta en un solo agente, usamos varios nodos
-
+    environment {
+        IMAGEN = "alealbaladejo/django_tutorial"
+        LOGIN = 'docker-hub-credentials'
+    }
+    agent any
     stages {
-        stage('Test en Docker') {
+        stage("Bajar_imagen") {
             agent {
-                docker { 
-                    image 'python:3' 
-                    args '-u root:root' 
+                docker {
+                    image "python:3"
+                    args '-u root:root'
                 }
             }
-            steps {
-                git branch: 'master', url: 'https://github.com/alealbaladejo/django_tutorial'
-                sh 'pip install -r requirements.txt'
-                sh 'python3 manage.py test'
-            }
-        }
-
-        stage('Build Docker Image') {
-            agent { label 'jenkins-node' }  // Se ejecuta en el nodo de Jenkins
-            steps {
-                sh 'docker build -t alealbaladejo/django_tutorial:latest .'
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            agent { label 'jenkins-node' }
-            steps {
-                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
-                    sh 'docker push alealbaladejo/django_tutorial:latest'
+            stages {
+                stage('Clonar_repo') {
+                    steps {
+                        git branch:'main',url:'https://github.com/alealbaladejo/django_tutorial_docker.git'
+                    }
                 }
+                stage('Instalar_requeriments') {
+                    steps {
+                        sh 'pip install -r django_tutorial/requirements_test.txt'
+                    }
+                }
+                stage('Test')
+                {
+                    steps {
+                        sh 'cd django_tutorial && python manage.py test --settings=django_tutorial.desarollo'
+                    }
+                }
+
             }
         }
-
-        stage('Clean up') {
-            agent { label 'jenkins-node' }
-            steps {
-                sh 'docker rmi alealbaladejo/django_tutorial:latest'
+        stage("Generar_imagen") {
+            agent any
+            stages {
+                stage('Construir_imagen') {
+                    steps {
+                        script {
+                            newApp = docker.build "$IMAGEN:latest"
+                        }
+                    }
+                }
+                stage('Subir_imagen') {
+                    steps {
+                        script {
+                            docker.withRegistry( '', LOGIN ) {
+                                newApp.push()
+                            }
+                        }
+                    }
+                }
+                stage('Borrar_imagen') {
+                    steps {
+                        sh "docker rmi $IMAGEN:latest"
+                    }
+                }
             }
         }
     }
-
     post {
-        success {
-            mail to: 'tuemail@example.com',
-                subject: 'Jenkins Pipeline Éxito ✅',
-                body: 'El pipeline ha finalizado correctamente y la imagen ha sido subida a Docker Hub.'
-        }
-        failure {
-            mail to: 'tuemail@example.com',
-                subject: 'Jenkins Pipeline Fallido ❌',
-                body: 'El pipeline ha fallado. Revisa los logs de Jenkins.'
+        always {
+            mail to: 'alealbaladejo29s@gmail.com@gmail.com',
+            subject: "Pipeline IC: ${currentBuild.fullDisplayName}",
+            body: "${env.BUILD_URL} has result ${currentBuild.result}"
         }
     }
 }
