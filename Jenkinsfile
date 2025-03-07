@@ -15,7 +15,7 @@ pipeline {
             stages {
                 stage('Clonar_repo') {
                     steps {
-                        git branch:'main',url:'https://github.com/alealbaladejo/django_tutorial.git'
+                        git branch:'master',url:'https://github.com/alealbaladejo/django_tutorial.git'
                     }
                 }
                 stage('Instalar_requeriments') {
