@@ -20,13 +20,13 @@ pipeline {
                 }
                 stage('Instalar_requeriments') {
                     steps {
-                        sh 'pip install -r django_tutorial/requirements_test.txt'
+                        sh 'pip install -r requirements_test.txt'
                     }
                 }
                 stage('Test')
                 {
                     steps {
-                        sh 'cd django_tutorial && python manage.py test --settings=django_tutorial.desarollo'
+                        sh 'python manage.py test --settings=django_tutorial.desarollo'
                     }
                 }
 
