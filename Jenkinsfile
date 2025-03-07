@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'python:3'
+        docker { image 'python:3.9'
         args '-u root:root'
         }
     }
@@ -12,7 +12,6 @@ pipeline {
         }
         stage('Instalar requeriments') {
             steps {
-		sh 'pip install --upgrade pip'
                 sh 'pip install -r requirements.txt'
             }
         }
