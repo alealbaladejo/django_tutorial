@@ -1,5 +1,5 @@
 pipeline {
-    agent none  // No se ejecuta en un solo agente, usaremos dos diferentes
+    agent none  // No se ejecuta en un solo agente, usamos varios nodos
 
     stages {
         stage('Test en Docker') {
@@ -10,30 +10,16 @@ pipeline {
                 }
             }
             steps {
-                stage('Clone') {
-                    steps {
-                        git branch: 'master', url: 'https://github.com/alealbaladejo/django_tutorial'
-                    }
-                }
-                stage('Install') {
-                    steps {
-                        sh 'pip install -r requirements.txt'
-                    }
-                }
-                stage('Test') {
-                    steps {
-                        sh 'python3 manage.py test'
-                    }
-                }
+                git branch: 'master', url: 'https://github.com/alealbaladejo/django_tutorial'
+                sh 'pip install -r requirements.txt'
+                sh 'python3 manage.py test'
             }
         }
 
         stage('Build Docker Image') {
             agent { label 'jenkins-node' }  // Se ejecuta en el nodo de Jenkins
             steps {
-                sh '''
-                    docker build -t alealbaladejo/django_tutorial:latest .
-                '''
+                sh 'docker build -t alealbaladejo/django_tutorial:latest .'
             }
         }
 
@@ -56,13 +42,13 @@ pipeline {
 
     post {
         success {
-            mail to: 'alealbaladejo29s@gmail.com',
-                subject: 'Jenkins Pipeline Éxito',
+            mail to: 'tuemail@example.com',
+                subject: 'Jenkins Pipeline Éxito ✅',
                 body: 'El pipeline ha finalizado correctamente y la imagen ha sido subida a Docker Hub.'
         }
         failure {
-            mail to: 'alealbaladejo29s@gmail.com',
-                subject: 'Jenkins Pipeline Fallido',
+            mail to: 'tuemail@example.com',
+                subject: 'Jenkins Pipeline Fallido ❌',
                 body: 'El pipeline ha fallado. Revisa los logs de Jenkins.'
         }
     }
