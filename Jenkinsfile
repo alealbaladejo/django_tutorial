@@ -8,7 +8,7 @@ pipeline {
         stage("Bajar_imagen") {
             agent {
                 docker {
-                    image "python:latest"
+                    image "python:3"
                     args '-u root:root'
                 }
             }
@@ -20,6 +20,7 @@ pipeline {
                 }
                 stage('Instalar_requeriments') {
                     steps {
+			sh 'pip install --upgrade pip'
                         sh 'pip install -r requirements_test.txt'
                     }
                 }
