@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Clonar repo') {
             steps {
-                git branch:'master',url:'https://github.com/alealbaladejo/ic-html5.git'
+                git branch:'master',url:'https://github.com/alealbaladejo/django_tutorial.git'
             }
         }
         stage('Instalar requeriments') {
