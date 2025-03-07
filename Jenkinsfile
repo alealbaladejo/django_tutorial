@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git branch:'master',url:'https://github.com/raulhr16/django_tutorial'
+                git branch:'master',url:'https://github.com/alealbaladejo/django_tutorial'
             }
         }
         stage('Install') {
