@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     sh 'ls -l'  // Verificar si el Dockerfile está presente
-                    newApp = docker.build("${0IMAGEN}:latest")
+                    newApp = docker.build("${IMAGEN}:latest")
                 }
             }
         }
@@ -73,3 +73,10 @@ pipeline {
         }
     }
 }
+
+
+
+
+
+
+
