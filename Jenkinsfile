@@ -7,8 +7,8 @@ pipeline {
         VPS_HOST = '54.38.183.131'
         VPS_DIR = '/home/debian/django_tutorial'
     }
-    agent any
 
+    agent any
     triggers {
         githubPush()
     }
@@ -33,7 +33,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    newApp = docker.build("$IMAGEN:latest")
+                    newApp = docker.build("$IMAGEN:latest") // Definimos newApp globalmente
                 }
             }
         }
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', LOGIN) {
-                        newApp.push()
+                        newApp.push() // newApp ahora es accesible aquí
                     }
                 }
             }
