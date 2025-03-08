@@ -5,7 +5,7 @@ pipeline {
         SSH_CRED = 'vps-ssh-credentials'  
         VPS_USER = 'debian'  
         VPS_HOST = '54.38.183.131'  
-        VPS_DIR = '/home/debian/django_app'  // Ruta donde está el proyecto en el VPS
+        VPS_DIR = '/home/debian/django_tutorial'  // Ruta donde está el proyecto en el VPS
     }
     agent any
 
