@@ -61,7 +61,7 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} "
                         cd ${VPS_DIR} &&
                         git pull &&
-                        docker compose down &&
+                        docker-compose down &&
                         docker pull ${IMAGEN}:latest &&
                         docker-compose up -d &&
                         docker image prune -f"
