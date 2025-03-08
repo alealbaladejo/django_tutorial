@@ -5,12 +5,12 @@ pipeline {
         SSH_CRED = 'vps-ssh-credentials'  
         VPS_USER = 'debian'
         VPS_HOST = '54.38.183.131'
-        VPS_DIR = '/home/debian/django_tutorial'  // Ruta donde está el proyecto en el VPS
+        VPS_DIR = '/home/debian/django_tutorial'
     }
     agent any
 
     triggers {
-        githubPush()  // Ejecuta el pipeline cuando haya un push en GitHub
+        githubPush()
     }
 
     stages {
@@ -31,15 +31,17 @@ pipeline {
 
         stage("Generar imagen Docker") {
             steps {
-		sh "docker build -t ${IMAGEN}:latest ."	
+                dir('django_tutorial') {
+                    sh "docker build -t ${IMAGEN}:latest ."
+                }
             }
         }
 
         stage("Subir imagen a Docker Hub") {
             steps {
                 script {
-                    docker.withRegistry('', LOGIN) {
-                        newApp.push()
+                    docker.withRegistry('https://index.docker.io/v1/', LOGIN) {
+                        docker.image("${IMAGEN}:latest").push()
                     }
                 }
             }
@@ -54,12 +56,20 @@ pipeline {
         stage("Desplegar en VPS") {
             steps {
                 sshagent(credentials: [SSH_CRED]) {
-                sh 'ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} "cd ${VPS_DIR} && git pull && docker compose down && docker pull ${IMAGEN}:latest && docker compose up -d && docker image prune -f"'       
-                    
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} "
+                        cd ${VPS_DIR} &&
+                        git pull &&
+                        docker compose down &&
+                        docker pull ${IMAGEN}:latest &&
+                        docker compose up -d &&
+                        docker image prune -f"
+                    """
                 }
             }
         }
     }
+
     post {
         always {
             emailext(
