@@ -6,4 +6,4 @@ chmod +x wait-for-it.sh
 ./wait-for-it.sh db:3306 --timeout=30 --strict
 python3 manage.py migrate
 python3 manage.py createsuperuser --username $DJANGO_USER --email $DJANGO_MAIL --noinput
-python3 manage.py runserver 0.0.0.0:3000
+python3 manage.py runserver 0.0.0.0:8000
