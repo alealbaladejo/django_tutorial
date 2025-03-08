@@ -1,4 +1,5 @@
-FROM python:3.12.1-bookworm
+#FROM python:3.12.1-bookworm
+FROM python:noexiste123
 WORKDIR /usr/src/app
 COPY ./ .
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
