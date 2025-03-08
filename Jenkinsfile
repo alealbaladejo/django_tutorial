@@ -32,7 +32,7 @@ pipeline {
         stage("Generar imagen Docker") {
             steps {
                 script {
-                    newApp = docker.build "${IMAGEN}:latest"
+                    newApp = docker.build("${IMAGEN}:latest")
                 }
             }
         }
@@ -72,10 +72,3 @@ pipeline {
         }
     }
 }
-
-
-
-
-
-
-
