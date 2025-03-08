@@ -31,9 +31,7 @@ pipeline {
 
         stage("Generar imagen Docker") {
             steps {
-                script {
-                    newApp = docker.build("${IMAGEN}:latest")
-                }
+		sh "docker build -t ${IMAGEN}:latest ."	
             }
         }
 
