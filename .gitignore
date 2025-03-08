@@ -4,3 +4,4 @@ polls/__pycache__/
 polls/migrations/__pycache__/
 
 django_tutorial/settings.py
+.env
