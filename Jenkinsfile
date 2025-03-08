@@ -63,7 +63,7 @@ pipeline {
                         git pull &&
                         docker compose down &&
                         docker pull ${IMAGEN}:latest &&
-                        docker compose up -d &&
+                        docker-compose up -d &&
                         docker image prune -f"
                     """
                 }
