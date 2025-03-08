@@ -31,13 +31,9 @@ pipeline {
 
         stage("Generar imagen Docker") {
             agent any
-            stages {
-                stage('Construir imagen'){
-                    steps{
-                        script{
-                            newApp = docker.build "$IMAGEN:latest"
-                        }
-                    }
+            steps {
+                script {
+                    newApp = docker.build("$IMAGEN:latest")
                 }
             }
         }
