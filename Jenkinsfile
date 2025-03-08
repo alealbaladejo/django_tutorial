@@ -40,7 +40,7 @@ pipeline {
         stage("Subir imagen a Docker Hub") {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', LOGIN) {
+                    docker.withRegistry('', LOGIN) {
                         docker.image("${IMAGEN}:latest").push()
                     }
                 }
