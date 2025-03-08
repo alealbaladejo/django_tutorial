@@ -5,6 +5,7 @@ pipeline {
         SSH_CRED = 'vps-ssh-credentials'  
         VPS_USER = 'debian'  
         VPS_HOST = '54.38.183.131'  
+        VPS_DIR = '/home/debian/django_app'  // Ruta donde está el proyecto en el VPS
     }
     agent any
 
@@ -58,12 +59,31 @@ pipeline {
                 script {
                     sshagent(credentials: [SSH_CRED]) {
                         sh """
+                        echo "🔄 Sincronizando archivos con el VPS..."
+                        rsync -avz --delete ./docker-compose.yaml .env ${VPS_USER}@${VPS_HOST}:${VPS_DIR}/
+
                         ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} << 'EOF'
-                        cd /ruta/donde/esta/docker-compose/
-                        docker-compose down  # Apagar el contenedor anterior
-                        docker pull ${IMAGEN}:latest  # Descargar la nueva imagen
-                        docker-compose up -d  # Levantar el servicio con la nueva imagen
-                        docker image prune -f  # Limpiar imágenes antiguas
+                        echo "📌 Navegando al directorio de la aplicación..."
+                        cd ${VPS_DIR}
+
+                        echo "📌 Bajando el contenedor antiguo..."
+                        docker compose stop app
+                        docker compose rm -f app
+
+                        echo "📌 Descargando la nueva imagen..."
+                        docker pull ${IMAGEN}:latest
+
+                        echo "📌 Levantando el nuevo contenedor..."
+                        docker compose up -d app
+
+                        echo "⌛ Esperando 10 segundos para verificar estado..."
+                        sleep 10
+
+                        echo "📌 Mostrando logs recientes..."
+                        docker compose logs --tail=20 app
+
+                        echo "🧹 Limpiando imágenes antiguas..."
+                        docker image prune -f
                         exit
                         EOF
                         """

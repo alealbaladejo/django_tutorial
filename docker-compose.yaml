@@ -1,37 +1,40 @@
-version: '3.8'
-
 services:
   app:
-    container_name: django_publicaciones
-    image: alealbaladejo/publicaciones:v1
+    container_name: polls
+    image: alealbaladejo/django_tutorial:latest
     restart: always
     environment:
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DJANGO_SUPERUSER_USERNAME=${ADMIN_USER}
-      - DJANGO_SUPERUSER_EMAIL=${ADMIN_EMAIL}
-      - DJANGO_SUPERUSER_PASSWORD=${ADMIN_PASS}
+      URL_BASE: ${URL_BASE}
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB: ${DB}
+      DJANGO_MAIL: ${DJANGO_MAIL}
+      DJANGO_USER: ${DJANGO_USER}
+      DJANGO_PASS: ${DJANGO_PASS}
     ports:
-      - "${PUERTO_DJ}:8000"
+      - "${PUERTO}:3000"  # Usa el puerto correcto de Django
     depends_on:
       - db
+    volumes:
+      - static_volume:/app/static  # Agregamos volumen para archivos estáticos
+      - media_volume:/app/media
 
   db:
-    container_name: mysql_django
-    image: mariadb
+    container_name: polls_db
+    image: mariadb:${VERSION_MARIADB}
     restart: always
     environment:
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - mariadb_data:/var/lib/mysql
-    ports:
-      - "${PUERTO_DB}:3306"
+      - polls_data:/var/lib/mysql
+      - mysql_config:/etc/mysql/conf.d  # Agregamos persistencia para configuración
 
 volumes:
-  mariadb_data:
+  polls_data:
+  static_volume:
+  media_volume:
+  mysql_config:
