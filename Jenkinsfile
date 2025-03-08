@@ -30,9 +30,14 @@ pipeline {
         }
 
         stage("Generar imagen Docker") {
-            steps {
-                dir('django_tutorial') {
-                    sh "docker build -t ${IMAGEN}:latest ."
+            agent any
+            stages {
+                stage('Construir imagen'){
+                    steps{
+                        script{
+                            newApp = docker.build "$IMAGEN:latest"
+                        }
+                    }
                 }
             }
         }
@@ -41,7 +46,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', LOGIN) {
-                        docker.image("${IMAGEN}:latest").push()
+                        newApp.push()
                     }
                 }
             }
@@ -49,7 +54,7 @@ pipeline {
 
         stage("Borrar imagen local") {
             steps {
-                sh "docker rmi ${IMAGEN}:latest"
+                sh "docker rmi $IMAGEN:latest"
             }
         }
 
