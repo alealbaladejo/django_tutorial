@@ -16,9 +16,6 @@ services:
       - "${PUERTO}:3000"  # Usa el puerto correcto de Django
     depends_on:
       - db
-    volumes:
-      - static_volume:/app/static  # Agregamos volumen para archivos estáticos
-
   db:
     container_name: polls_db
     image: mariadb:${VERSION_MARIADB}
@@ -30,7 +27,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - polls_data:/var/lib/mysql
-      - mysql_config:/etc/mysql/conf.d  # Agregamos persistencia para configuración
 
 volumes:
   polls_data:
