@@ -32,8 +32,7 @@ pipeline {
         stage("Generar imagen Docker") {
             steps {
                 script {
-                    sh 'ls -l'  // Verificar si el Dockerfile está presente
-                    newApp = docker.build("${IMAGEN}:latest")
+                    newApp = docker.build "${IMAGEN}:latest"
                 }
             }
         }
