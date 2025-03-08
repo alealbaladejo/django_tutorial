@@ -2,69 +2,84 @@ pipeline {
     environment {
         IMAGEN = "alealbaladejo/django_tutorial"
         LOGIN = 'docker-hub-credentials'
+        SSH_CRED = 'vps-ssh-credentials'  
+        VPS_USER = 'debian'  
+        VPS_HOST = '54.38.183.131'  
     }
     agent any
+
+    triggers {
+        githubPush()  // Ejecuta el pipeline cuando haya un push en GitHub
+    }
+
     stages {
-        stage("Bajar_imagen") {
+        stage("Test en Docker") {
             agent {
                 docker {
                     image "python:3"
                     args '-u root:root'
                 }
             }
-            stages {
-                stage('Clonar_repositorio') {
-                    steps {
-                        git branch:'master',url:'https://github.com/alealbaladejo/django_tutorial.git'
-                    }
-                }
-                stage('Instalar requirementes') {
-                    steps {
-			sh 'pip install --upgrade pip'
-                        sh 'pip install -r requirements.txt'
-                    }
-                }
-                stage('Probar Test')
-                {
-                    steps {
-                        sh 'python manage.py test'
-                    }
-                }
-
+            steps {
+                git branch: 'master', url: 'https://github.com/alealbaladejo/django_tutorial.git'
+                sh 'pip install --upgrade pip'
+                sh 'pip install -r requirements.txt'
+                sh 'python manage.py test'
             }
         }
-        stage("Generar_imagen docker") {
-            agent any
-            stages {
-                stage('Construir imagen') {
-                    steps {
-                        script {
-                            newApp = docker.build "$IMAGEN:latest"
-                        }
+
+        stage("Generar imagen Docker") {
+            steps {
+                script {
+                    sh 'ls -l'  // Verificar si el Dockerfile está presente
+                    newApp = docker.build("${IMAGEN}:latest")
+                }
+            }
+        }
+
+        stage("Subir imagen a Docker Hub") {
+            steps {
+                script {
+                    docker.withRegistry('', LOGIN) {
+                        newApp.push()
                     }
                 }
-                stage('Subir imagen a dockerhub') {
-                    steps {
-                        script {
-                            docker.withRegistry( '', LOGIN ) {
-                                newApp.push()
-                            }
-                        }
-                    }
-                }
-                stage('Borrar_imagen') {
-                    steps {
-                        sh "docker rmi $IMAGEN:latest"
+            }
+        }
+
+        stage("Borrar imagen local") {
+            steps {
+                sh "docker rmi ${IMAGEN}:latest"
+            }
+        }
+
+        stage("Desplegar en VPS") {
+            steps {
+                script {
+                    sshagent(credentials: [SSH_CRED]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} << 'EOF'
+                        cd /ruta/donde/esta/docker-compose/
+                        docker-compose down  # Apagar el contenedor anterior
+                        docker pull ${IMAGEN}:latest  # Descargar la nueva imagen
+                        docker-compose up -d  # Levantar el servicio con la nueva imagen
+                        docker image prune -f  # Limpiar imágenes antiguas
+                        exit
+                        EOF
+                        """
                     }
                 }
             }
         }
     }
+
     post {
         always {
-            mail to: 'alealbaladejo29s@gmail.com',
-            subject: "Pipeline IC: ${currentBuild.fullDisplayName}",
-            body: "${env.BUILD_URL} FINAL PIPELINE:  ${currentBuild.result}"
+            emailext(
+                to: 'alealbaladejo29s@gmail.com',
+                subject: "Pipeline IC: ${currentBuild.fullDisplayName}",
+                body: "${env.BUILD_URL} ha terminado con estado ${currentBuild.result}"
+            )
         }
     }
 }
