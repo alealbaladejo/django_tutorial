@@ -18,7 +18,6 @@ services:
       - db
     volumes:
       - static_volume:/app/static  # Agregamos volumen para archivos estáticos
-      - media_volume:/app/media
 
   db:
     container_name: polls_db
