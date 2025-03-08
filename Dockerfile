@@ -5,7 +5,7 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
 && pip install mysqlclient \
 && pip install --no-cache-dir --break-system-packages -r requirements.txt
-EXPOSE 3000
+EXPOSE 8000
 ENV URL_BASE=http://localhost
 ENV DB_HOST=localhost
 ENV DB_USER=usuario
