@@ -13,7 +13,7 @@ services:
       DJANGO_USER: ${DJANGO_USER}
       DJANGO_PASS: ${DJANGO_PASS}
     ports:
-      - "${PUERTO}:8000"  # Usa el puerto correcto de Django
+      - "${PUERTO}:8000"  
     depends_on:
       - db
   db:
