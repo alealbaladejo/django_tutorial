@@ -26,7 +26,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - polls_data:/var/lib/mysql
- 
+      - polls_data:/var/lib/mysql 
 volumes:
   polls_data:
